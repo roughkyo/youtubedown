@@ -42,7 +42,7 @@ STATIC = {
 }
 CANCEL_MESSAGE = "사용자에 의해 작업이 취소되었습니다."
 
-# Mode table (SPEC.md section 2).
+# Mode table (SPEC.md section 2): best, 1080, 720, 480, mp3.
 MODES = {
     "best": {
         "format": "bv*+ba/b",
