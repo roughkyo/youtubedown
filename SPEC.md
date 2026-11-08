@@ -40,7 +40,6 @@
 
 ## 4. 안전 장치
 
-- 인증서 검증을 끄지 않음 (`nocheckcertificate` 미사용)
 - 오류를 무시하지 않음 (`ignoreerrors` 미사용): 실패를 성공처럼 처리하지 않고 정확한 오류를 보여줌
 - 주소는 YouTube 도메인(`youtube.com`, `youtu.be`, `music.youtube.com`)만 허용
 - Host 헤더 검사로 DNS rebinding 차단, POST는 JSON 요청만 허용
