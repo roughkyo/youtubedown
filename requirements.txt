@@ -1,1 +1,2 @@
-yt-dlp>=2026.7.4
+# [default] adds yt-dlp-ejs, the solver yt-dlp needs for YouTube's JavaScript challenges
+yt-dlp[default]>=2026.10.26

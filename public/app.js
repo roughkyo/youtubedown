@@ -128,7 +128,12 @@ async function loadToolInfo() {
       (info.outdated ? ` — ${info.outdated_days}일이 지나 업데이트를 권장합니다.` : " — 최신 상태에 가깝습니다.");
     box.classList.add(info.outdated ? "old" : "ok");
     $("update-cmd").textContent = info.update_command;
-    if (info.outdated) {
+    if (info.restart_required) {
+      const alert = $("update-alert");
+      alert.textContent = `⚠ yt-dlp가 ${info.yt_dlp_installed}(으)로 업데이트되었지만 서버는 아직 이전 버전(${info.yt_dlp})으로 실행 중입니다. 서버를 껐다 켜야 다운로드가 정상 동작합니다.`;
+      alert.hidden = false;
+      box.classList.replace("ok", "old");
+    } else if (info.outdated) {
       const alert = $("update-alert");
       alert.textContent = `⚠ yt-dlp(${info.yt_dlp})가 ${age}일 지난 버전입니다. 다운로드가 실패하면 업데이트하세요 →`;
       alert.hidden = false;

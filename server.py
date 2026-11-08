@@ -12,6 +12,7 @@ import threading
 import traceback
 from datetime import date
 from http import HTTPStatus
+from importlib import metadata
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import quote, urlparse, parse_qs
@@ -84,9 +85,18 @@ UPDATE_COMMAND = "python -m pip install -U yt-dlp"
 OUTDATED_DAYS = 90  # yt-dlp itself warns once a release is older than this
 
 
+def _vkey(v: str) -> tuple:
+    """Compare versions numerically: pip normalises 2026.07.04 to 2026.7.4."""
+    return tuple(int(p) if p.isdigit() else p for p in v.split("."))
+
+
 def tool_info(today: date | None = None) -> dict:
     """Installed tool versions for the page's update guide. Version strings are YYYY.MM.DD[.N]."""
-    version = yt_dlp.version.__version__
+    version = yt_dlp.version.__version__  # the copy loaded in this process
+    try:
+        installed = metadata.version("yt-dlp")  # what pip has on disk now
+    except metadata.PackageNotFoundError:
+        installed = None
     age = None
     try:
         y, m, d = (int(p) for p in version.split(".")[:3])
@@ -95,6 +105,10 @@ def tool_info(today: date | None = None) -> dict:
         pass  # unknown format: leave the age unknown rather than guessing
     return {
         "yt_dlp": version,
+        "yt_dlp_installed": installed,
+        # yt-dlp was upgraded while this server kept running the old copy: downloads
+        # then fail with 403 until the server is restarted.
+        "restart_required": installed is not None and _vkey(installed) != _vkey(version),
         "yt_dlp_age_days": age,
         "outdated": age is not None and age > OUTDATED_DAYS,
         "outdated_days": OUTDATED_DAYS,
@@ -256,6 +270,15 @@ def run_job(job: Job) -> None:
         with job.lock:
             logs = list(job.logs)
         diagnosis = diagnose.diagnose(error, logs)
+        info = tool_info()
+        if info["restart_required"]:
+            diagnosis = {
+                "code": "restart_required",
+                "title": "서버 재시작 필요",
+                "cause": f"yt-dlp가 {info['yt_dlp_installed']}(으)로 업데이트되었지만 이 서버는 이전 버전 "
+                         f"{info['yt_dlp']}로 실행 중입니다. ({diagnosis['title']})",
+                "fix": "서버 창을 닫고 start.bat(또는 python server.py)으로 다시 실행한 뒤 다시 시도하세요.",
+            }
         job.log(f"🔎 진단: {diagnosis['title']} — {diagnosis['cause']}")
         job.log(f"🛠 해결 방법: {diagnosis['fix']}")
         try:

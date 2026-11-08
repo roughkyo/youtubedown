@@ -141,6 +141,14 @@ class ToolInfo(ServerTestBase):
             info = server.tool_info()
         self.assertEqual((info["yt_dlp_age_days"], info["outdated"]), (None, False))
 
+    def test_restart_required_when_disk_version_differs(self):
+        with mock.patch.object(server.yt_dlp.version, "__version__", "2026.07.04"):
+            with mock.patch.object(server.metadata, "version", return_value="2026.10.26"):
+                self.assertTrue(server.tool_info()["restart_required"])
+            # pip normalises 2026.07.04 to 2026.7.4; that is the same release
+            with mock.patch.object(server.metadata, "version", return_value="2026.7.4"):
+                self.assertFalse(server.tool_info()["restart_required"])
+
     def test_info_endpoint(self):
         status, info = self.client.request("GET", "/api/info")
         self.assertEqual(status, 200)
