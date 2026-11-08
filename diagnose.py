@@ -8,15 +8,22 @@ from __future__ import annotations
 
 import json
 import re
-import shutil
 import threading
 from datetime import datetime
-from pathlib import Path
 
 import yt_dlp
 
-LOGS = Path(__file__).resolve().parent / "logs"
+import paths
+
+LOGS = paths.LOGS
 _INDEX_LOCK = threading.Lock()
+
+# How to get a newer yt-dlp depends on how the app is installed.
+UPDATE_HINT = (
+    f"새 버전 exe를 {paths.RELEASES_URL} 에서 받아 기존 파일과 바꾼 뒤 다시 실행하세요."
+    if paths.FROZEN else
+    "start.bat으로 다시 실행하거나, 터미널에서 `python -m pip install -U yt-dlp` 후 서버를 다시 실행하세요."
+)
 
 # (code, title, cause, fix, patterns) — checked in order; first match wins.
 RULES: list[tuple[str, str, str, str, tuple[str, ...]]] = [
@@ -55,10 +62,10 @@ RULES: list[tuple[str, str, str, str, tuple[str, ...]]] = [
      "잠시 뒤 다시 시도하세요.",
      ("http error 429", "too many requests")),
     ("forbidden", "접근 거부(403)", "YouTube가 다운로드 요청을 거부했습니다. yt-dlp가 오래된 경우 자주 발생합니다.",
-     "터미널에서 `python -m pip install -U yt-dlp`로 업데이트한 뒤 서버를 다시 실행하세요.",
+     "{update}",
      ("http error 403", "403: forbidden")),
     ("extractor_outdated", "추출기 오류", "YouTube 페이지 구조가 바뀌어 yt-dlp가 영상 정보를 읽지 못했습니다.",
-     "터미널에서 `python -m pip install -U yt-dlp`로 업데이트한 뒤 서버를 다시 실행하세요.",
+     "{update}",
      ("unable to extract", "nsig extraction failed", "signature extraction failed", "n challenge",
       "please report this issue", "confirm you are on the latest version")),
     ("network", "네트워크 오류", "인터넷 연결이 끊겼거나 응답이 너무 늦습니다.",
@@ -79,12 +86,12 @@ RULES: list[tuple[str, str, str, str, tuple[str, ...]]] = [
      ("다운로드된 파일을 찾지 못했습니다",)),
     # Only reached through warning lines when the error itself matched nothing above.
     ("outdated_ytdlp", "yt-dlp 업데이트 필요", "yt-dlp가 오래되어 YouTube 변경을 따라가지 못했을 가능성이 큽니다.",
-     "터미널에서 `python -m pip install -U yt-dlp`로 업데이트한 뒤 서버를 다시 실행하세요.",
+     "{update}",
      ("older than 90 days", "is out of date")),
 ]
 
 UNKNOWN = ("unknown", "알 수 없는 오류", "분류되지 않은 오류입니다.",
-           "로그 파일을 내려받아 오류 내용을 확인하세요. yt-dlp 업데이트로 해결되는 경우가 많습니다.")
+           "로그 파일을 내려받아 오류 내용을 확인하세요. yt-dlp 업데이트로 해결되는 경우가 많습니다: {update}")
 
 
 def _norm(text: str) -> str:
@@ -98,16 +105,17 @@ def diagnose(error: str, logs: list[str]) -> dict:
         text = _norm(source)
         for code, title, cause, fix, patterns in RULES:
             if any(p.lower() in text for p in patterns):
-                return {"code": code, "title": title, "cause": cause, "fix": fix}
+                return {"code": code, "title": title, "cause": cause, "fix": fix.format(update=UPDATE_HINT)}
     code, title, cause, fix = UNKNOWN
-    return {"code": code, "title": title, "cause": cause, "fix": fix}
+    return {"code": code, "title": title, "cause": cause, "fix": fix.format(update=UPDATE_HINT)}
 
 
 def environment() -> dict:
     return {
         "yt_dlp": yt_dlp.version.__version__,
-        "ffmpeg": shutil.which("ffmpeg"),
-        "js_runtime": shutil.which("node"),
+        "ffmpeg": paths.ffmpeg_path(),
+        "js_runtime": paths.node_path(),
+        "build": "exe" if paths.FROZEN else "source",
     }
 
 

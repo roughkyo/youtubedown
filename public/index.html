@@ -117,7 +117,12 @@
         <span id="version-text">확인 중...</span>
       </div>
 
-      <ol class="steps">
+      <ol class="steps" id="update-exe" hidden>
+        <li>검은 콘솔 창을 닫아 프로그램을 끕니다.</li>
+        <li><a id="update-link" href="https://github.com/roughkyo/youtubedown/releases/latest" target="_blank" rel="noopener">GitHub Releases</a>에서 최신 <code>YTDownloader.exe</code>를 받습니다. 매주 최신 yt-dlp로 새로 만들어집니다.</li>
+        <li>기존 exe 파일을 새 파일로 바꾸고 다시 실행합니다.</li>
+      </ol>
+      <ol class="steps" id="update-pip">
         <li>이 서버를 실행한 터미널에서 <kbd>Ctrl</kbd> + <kbd>C</kbd>로 서버를 끕니다.</li>
         <li>아래 명령을 실행합니다.
           <div class="cmd">

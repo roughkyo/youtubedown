@@ -5,6 +5,12 @@ logs/
 # Reverse-engineering evidence extracted from a third-party binary (never publish)
 re/
 
+# exe build output (released through GitHub Releases, never committed)
+build/
+dist/
+.venv-build/
+*.spec
+
 # Python
 __pycache__/
 *.pyc

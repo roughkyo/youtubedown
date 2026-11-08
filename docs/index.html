@@ -123,12 +123,12 @@
     <section class="hero">
       <p class="eyebrow gradient-text">교육용 미디어 도구</p>
       <h1>수업 자료를<br><span class="gradient-text">내 PC에서 간단하게.</span></h1>
-      <p class="lead">YouTube 링크를 붙여넣고 형식을 고르면 끝. 설치 후 <code>start.bat</code>을 더블클릭하면 내 PC에서 바로 실행되는 무료 도구입니다.</p>
+      <p class="lead">YouTube 링크를 붙여넣고 형식을 고르면 끝. exe 파일 하나만 받아 더블클릭하면 내 PC에서 바로 실행되는 무료 도구입니다.</p>
       <div class="cta">
-        <a class="btn primary" href="https://github.com/roughkyo/youtubedown/archive/refs/heads/main.zip">ZIP 내려받기</a>
-        <a class="btn ghost" href="#install">설치 방법 보기</a>
+        <a class="btn primary" href="https://github.com/roughkyo/youtubedown/releases/latest/download/YTDownloader.exe">exe 내려받기 (Windows)</a>
+        <a class="btn ghost" href="#install">사용 방법 보기</a>
       </div>
-      <p class="meta">Windows 10·11 기준 · Python, ffmpeg 필요</p>
+      <p class="meta">Windows 10·11 · 설치 필요 없음 · 매주 최신 버전으로 새로 만들어집니다</p>
     </section>
 
     <section class="panel notice" aria-labelledby="notice-title">
@@ -148,14 +148,32 @@
       <div class="grid">
         <div class="card"><h3>형식 5가지</h3><p>원본 화질, 1080p, 720p, 480p, MP3(192kbps) 중에서 고릅니다.</p></div>
         <div class="card"><h3>실패 원인 진단</h3><p>비공개·연령 제한·삭제·접근 거부 등 실패 이유와 해결 방법을 알려주고 로그를 남깁니다.</p></div>
-        <div class="card"><h3>자동 업데이트</h3><p><code>start.bat</code>으로 켤 때마다 yt-dlp를 최신으로 맞춰 YouTube 변경에 대응합니다.</p></div>
+        <div class="card"><h3>매주 새 버전</h3><p>YouTube 변경에 대응하도록 매주 최신 yt-dlp로 exe를 새로 만듭니다. 오래된 exe면 화면에서 알려줍니다.</p></div>
         <div class="card"><h3>내 PC 전용</h3><p>서버가 내 컴퓨터 안에서만 열립니다. 다른 기기에서는 접속되지 않습니다.</p></div>
       </div>
     </section>
 
     <section class="panel" id="install" aria-labelledby="install-title">
-      <span class="pill info"><span class="dot" aria-hidden="true"></span>설치 (Windows)</span>
-      <h2 id="install-title">처음 한 번만 준비하면 됩니다.</h2>
+      <span class="pill info"><span class="dot" aria-hidden="true"></span>시작하기 (Windows)</span>
+      <h2 id="install-title">exe 하나면 됩니다.</h2>
+      <ol class="steps">
+        <li>
+          <h3>exe 내려받기</h3>
+          <p><a href="https://github.com/roughkyo/youtubedown/releases/latest/download/YTDownloader.exe">YTDownloader.exe</a>를 받아 바탕화면이나 원하는 폴더에 둡니다. Python·ffmpeg가 모두 들어 있어 따로 설치할 것이 없습니다.</p>
+        </li>
+        <li>
+          <h3>더블클릭</h3>
+          <p>검은 창이 뜨고 잠시 뒤 브라우저에서 <code>http://127.0.0.1:8765</code>가 자동으로 열립니다. 검은 창을 닫으면 프로그램이 꺼집니다.</p>
+          <p>"Windows의 PC 보호" 창이 뜨면 <strong>추가 정보 → 실행</strong>을 누르세요. 서명되지 않은 무료 프로그램이라 처음 한 번 뜹니다.</p>
+        </li>
+        <li>
+          <h3>가끔 새 버전으로 바꾸기</h3>
+          <p>화면에 "최신 exe를 받으세요" 안내가 뜨거나 다운로드가 자꾸 실패하면, 위 링크에서 새 exe를 받아 기존 파일과 바꾸세요.</p>
+        </li>
+      </ol>
+
+      <h3 style="margin-top:28px">다른 방법: 소스로 실행 (Python 사용자)</h3>
+      <p class="muted">macOS·Linux이거나 Python으로 직접 실행하고 싶다면 아래 순서를 따르세요. <code>start.bat</code>은 켤 때마다 yt-dlp를 자동으로 최신화합니다.</p>
       <ol class="steps">
         <li>
           <h3>Python 설치</h3>
@@ -196,7 +214,11 @@
       <h2 id="faq-title">자주 묻는 질문</h2>
       <details>
         <summary>다운로드가 실패해요.</summary>
-        <p>화면에 실패 원인과 해결 방법이 표시되고, "실패 로그 받기"로 자세한 기록을 볼 수 있습니다. "접근 거부(403)"나 "추출기 오류"라면 프로그램을 끄고 <code>start.bat</code>으로 다시 켜서 yt-dlp를 업데이트하세요.</p>
+        <p>화면에 실패 원인과 해결 방법이 표시되고, "실패 로그 받기"로 자세한 기록을 볼 수 있습니다(exe 옆 <code>logs</code> 폴더에도 저장됩니다). "접근 거부(403)"나 "추출기 오류"라면 대부분 yt-dlp가 오래된 경우입니다. 최신 exe로 바꾸거나, 소스로 실행 중이라면 <code>start.bat</code>으로 다시 켜세요.</p>
+      </details>
+      <details>
+        <summary>백신이 exe를 막아요.</summary>
+        <p>PyInstaller로 만든 서명 없는 exe는 일부 백신이 잘못 경고하는 경우가 있습니다. 걱정되면 GitHub의 소스 코드로 직접 실행하세요(위 "소스로 실행").</p>
       </details>
       <details>
         <summary>원본 화질 파일이 재생되지 않아요.</summary>

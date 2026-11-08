@@ -1,30 +1,34 @@
 """Local web YouTube downloader for education (see SPEC.md).
 
-Runs only on 127.0.0.1. Uses the locally installed yt-dlp library and system ffmpeg.
+Runs only on 127.0.0.1. Uses the yt-dlp library and ffmpeg (bundled in the exe
+build, otherwise from PATH). `--check` prints the environment and exits;
+`--no-browser` stops the exe from opening the browser on start.
 """
 from __future__ import annotations
 
+import errno
 import json
 import os
 import secrets
 import shutil
+import sys
 import threading
 import traceback
+import webbrowser
 from datetime import date
 from http import HTTPStatus
 from importlib import metadata
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
-from pathlib import Path
 from urllib.parse import quote, urlparse, parse_qs
 
 import yt_dlp
 from yt_dlp.utils import DownloadError
 
 import diagnose
+import paths
 
-ROOT = Path(__file__).resolve().parent
-PUBLIC = ROOT / "public"
-DOWNLOADS = ROOT / "downloads"
+PUBLIC = paths.PUBLIC
+DOWNLOADS = paths.WORK_DIR
 HOST = "127.0.0.1"
 PORT = int(os.environ.get("PORT", "8765"))
 MAX_RUNNING = 2
@@ -93,10 +97,12 @@ def _vkey(v: str) -> tuple:
 def tool_info(today: date | None = None) -> dict:
     """Installed tool versions for the page's update guide. Version strings are YYYY.MM.DD[.N]."""
     version = yt_dlp.version.__version__  # the copy loaded in this process
-    try:
-        installed = metadata.version("yt-dlp")  # what pip has on disk now
-    except metadata.PackageNotFoundError:
-        installed = None
+    installed = None
+    if not paths.FROZEN:  # an exe can't be upgraded underneath itself
+        try:
+            installed = metadata.version("yt-dlp")  # what pip has on disk now
+        except metadata.PackageNotFoundError:
+            pass
     age = None
     try:
         y, m, d = (int(p) for p in version.split(".")[:3])
@@ -112,9 +118,11 @@ def tool_info(today: date | None = None) -> dict:
         "yt_dlp_age_days": age,
         "outdated": age is not None and age > OUTDATED_DAYS,
         "outdated_days": OUTDATED_DAYS,
-        "update_command": UPDATE_COMMAND,
-        "ffmpeg": shutil.which("ffmpeg") is not None,
-        "js_runtime": shutil.which("node") is not None,
+        "frozen": paths.FROZEN,
+        "update_command": None if paths.FROZEN else UPDATE_COMMAND,
+        "update_url": paths.RELEASES_URL,
+        "ffmpeg": paths.ffmpeg_path() is not None,
+        "js_runtime": paths.node_path() is not None,
     }
 
 
@@ -228,10 +236,10 @@ def run_job(job: Job) -> None:
         "noprogress": True,
         "windowsfilenames": True,
     }
-    ffmpeg = shutil.which("ffmpeg")
+    ffmpeg = paths.ffmpeg_path()
     if ffmpeg:
         opts["ffmpeg_location"] = ffmpeg
-    if shutil.which("node"):
+    if paths.node_path():
         # yt-dlp only enables deno by default; Node.js is its recommended alternative
         # for solving YouTube's JavaScript challenges.
         opts["js_runtimes"] = {"deno": {}, "node": {}}
@@ -427,10 +435,40 @@ class Handler(BaseHTTPRequestHandler):
         self._error(HTTPStatus.NOT_FOUND, "없는 경로입니다.")
 
 
+def check() -> int:
+    """--check: report the environment; non-zero when the app could not download."""
+    info = tool_info()
+    print(f"build     : {'exe' if paths.FROZEN else 'source'}")
+    print(f"yt-dlp    : {info['yt_dlp']}")
+    print(f"ffmpeg    : {paths.ffmpeg_path() or 'missing'}")
+    print(f"node      : {paths.node_path() or 'none (optional)'}")
+    print(f"public    : {'ok' if (PUBLIC / 'index.html').is_file() else 'missing'}")
+    print(f"logs      : {paths.LOGS}")
+    ok = paths.ffmpeg_path() is not None and (PUBLIC / "index.html").is_file()
+    return 0 if ok else 1
+
+
 def main() -> None:
-    DOWNLOADS.mkdir(exist_ok=True)
-    server = ThreadingHTTPServer((HOST, PORT), Handler)
-    print(f"유튜브 다운로더 웹: http://{HOST}:{PORT}  (ffmpeg: {shutil.which('ffmpeg') or '없음'})", flush=True)
+    if "--check" in sys.argv[1:]:
+        sys.exit(check())
+    url = f"http://{HOST}:{PORT}"
+    try:
+        server = ThreadingHTTPServer((HOST, PORT), Handler)
+    except OSError as exc:
+        if exc.errno == errno.EADDRINUSE or getattr(exc, "winerror", None) == 10048:
+            print(f"이미 실행 중입니다. 브라우저에서 {url} 을 엽니다.", flush=True)
+            webbrowser.open(url)
+            return
+        raise
+    # In-progress files from a previous run belong to jobs that no longer exist.
+    shutil.rmtree(DOWNLOADS, ignore_errors=True)
+    DOWNLOADS.mkdir(parents=True, exist_ok=True)
+    print("유튜브 다운로더 (교육용 · 로컬 전용)", flush=True)
+    print(f"  주소   : {url}", flush=True)
+    print(f"  yt-dlp : {yt_dlp.version.__version__}   ffmpeg: {'있음' if paths.ffmpeg_path() else '없음'}", flush=True)
+    print("  이 창을 닫으면 프로그램이 꺼집니다.", flush=True)
+    if paths.FROZEN and "--no-browser" not in sys.argv[1:]:
+        webbrowser.open(url)
     try:
         server.serve_forever()
     except KeyboardInterrupt:

@@ -267,7 +267,8 @@ input[type="url"]:disabled { opacity: .6; }
 .pill.info { color: #93C5FD; }
 .dot.info { background: #93C5FD; box-shadow: 0 0 10px #93C5FD; }
 .update h2 { font-size: 1.3rem; font-weight: 500; margin: 16px 0 8px; }
-.update { scroll-margin-top: 100px; } /* keep the heading clear of the sticky nav on #update jumps */
+.update { scroll-margin-top: 100px; }
+.update a { color: #C4B5FD; } /* keep the heading clear of the sticky nav on #update jumps */
 .muted { color: var(--muted); margin: 0 0 12px; }
 .small-text { font-size: .85rem; margin: 14px 0 0; }
 .version {
