@@ -3,6 +3,8 @@
 수업 자료 준비를 위해 **내 PC에서만** 실행하는 유튜브 다운로더 웹앱입니다.
 링크를 붙여넣고 형식을 고르면, 완료된 파일을 브라우저 다운로드로 받습니다.
 
+**설치 안내 페이지: <https://roughkyo.github.io/youtubedown/>**
+
 > ⚠ **교육용 목적에 한해 사용하세요.**
 > 본인이 만든 영상, 허락받은 영상, CC 라이선스 영상처럼 이용 권한이 있는 콘텐츠만 받고,
 > 재배포·재업로드·상업적 이용은 하지 마세요. YouTube 이용약관은 허가 없는 다운로드를 제한하며,
@@ -23,6 +25,10 @@
 - Node.js (선택) — 있으면 yt-dlp가 YouTube의 JavaScript 확인을 처리하는 데 사용
 
 ## 실행
+
+**Windows:** `start.bat`을 더블클릭하세요. Python·ffmpeg를 확인하고, yt-dlp를 설치·업데이트한 뒤 서버를 켜고 브라우저를 엽니다.
+
+직접 실행하려면:
 
 ```bash
 pip install -r requirements.txt
@@ -54,6 +60,8 @@ python test_server.py --live   # 실제 YouTube 다운로드까지 포함
 | `diagnose.py` | 실패 원인 분류, 실패 로그 기록 |
 | `public/` | 웹 화면 (HTML/CSS/JS) |
 | `test_server.py` | 단위·API·실제 다운로드 테스트 |
+| `start.bat` | Windows 원클릭 실행 (준비 확인 + yt-dlp 업데이트 + 서버 실행) |
+| `docs/` | GitHub Pages 설치 안내 페이지 |
 | `SPEC.md` | 기능 명세 |
 
 제작: yangphago
