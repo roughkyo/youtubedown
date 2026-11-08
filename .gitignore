@@ -1,0 +1,18 @@
+# Downloaded media and failure logs stay on the local machine
+downloads/
+logs/
+
+# Reverse-engineering evidence extracted from a third-party binary (never publish)
+re/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>유튜브 다운로더 · 교육용</title>
+  <meta name="description" content="수업 자료 준비를 위한 로컬 전용 유튜브 다운로더. 교육용 목적에 한해 사용합니다.">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600&family=Noto+Sans+KR:wght@400;500;700&display=swap">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div class="rays" aria-hidden="true"></div>
+
+  <header class="nav">
+    <a class="brand" href="/">
+      <span class="ring" aria-hidden="true"></span>
+      <span>YT Downloader</span>
+    </a>
+    <span class="nav-chip">로컬 전용</span>
+  </header>
+
+  <main>
+    <section class="hero">
+      <p class="eyebrow gradient-text">교육용 미디어 도구</p>
+      <h1>수업 자료를<br><span class="gradient-text">간단하게 저장하세요.</span></h1>
+      <p class="lead">YouTube 링크를 붙여넣고 형식을 고르면 됩니다. 완료되면 브라우저의 다운로드 폴더로 저장됩니다.</p>
+    </section>
+
+    <section class="panel" aria-labelledby="dl-title">
+      <span class="pill"><span class="ring small" aria-hidden="true"></span>다운로드</span>
+      <h2 id="dl-title" class="sr-only">다운로드</h2>
+      <a id="update-alert" class="update-alert" href="#update" hidden></a>
+
+      <form id="form" autocomplete="off">
+        <label for="url" class="label">YouTube 링크</label>
+        <input id="url" name="url" type="url" inputmode="url" placeholder="https://www.youtube.com/watch?v=..." required>
+
+        <fieldset class="modes">
+          <legend class="label">형식</legend>
+          <label class="mode">
+            <input type="radio" name="mode" value="best">
+            <span><strong>원본</strong><small>최고 화질</small></span>
+          </label>
+          <label class="mode">
+            <input type="radio" name="mode" value="1080">
+            <span><strong>1080p</strong><small>FHD 영상</small></span>
+          </label>
+          <label class="mode">
+            <input type="radio" name="mode" value="720" checked>
+            <span><strong>720p</strong><small>기본 영상</small></span>
+          </label>
+          <label class="mode">
+            <input type="radio" name="mode" value="480">
+            <span><strong>480p</strong><small>가벼운 영상</small></span>
+          </label>
+          <label class="mode">
+            <input type="radio" name="mode" value="mp3">
+            <span><strong>MP3</strong><small>오디오만</small></span>
+          </label>
+        </fieldset>
+        <p id="mode-hint" class="mode-hint" aria-live="polite"></p>
+
+        <div class="actions">
+          <button id="start" type="submit" class="btn primary">다운로드 시작</button>
+          <button id="stop" type="button" class="btn ghost" disabled>작업 중지</button>
+        </div>
+      </form>
+
+      <div class="progress" aria-hidden="true"><div id="bar"></div></div>
+      <p id="status" class="status" role="status" aria-live="polite"></p>
+      <a id="save" class="btn save" hidden>파일 저장하기</a>
+
+      <div id="diag" class="diag" hidden>
+        <p class="diag-title"><span class="dot fail" aria-hidden="true"></span><span id="diag-title"></span></p>
+        <dl>
+          <dt>원인</dt><dd id="diag-cause"></dd>
+          <dt>해결 방법</dt><dd id="diag-fix"></dd>
+        </dl>
+        <a id="diag-log" class="btn ghost small" hidden>실패 로그 받기</a>
+      </div>
+
+      <details class="logbox" open>
+        <summary>진행 상황</summary>
+        <pre id="log" class="log" tabindex="0"></pre>
+      </details>
+    </section>
+
+    <section class="panel notice" aria-labelledby="notice-title">
+      <span class="pill warn"><span class="dot" aria-hidden="true"></span>주의사항</span>
+      <h2 id="notice-title">교육용 목적에 한해 사용하세요.</h2>
+      <ul>
+        <li>본인이 만든 영상, 저작권자에게 허락받은 영상, CC 라이선스 영상처럼 <strong>이용 권한이 있는 콘텐츠</strong>만 받으세요.</li>
+        <li>받은 파일은 수업과 교육 활동 안에서만 사용하고, <strong>재배포·재업로드·상업적 이용은 하지 마세요.</strong></li>
+        <li>교육 목적이라도 저작권법이 허용하는 범위를 넘으면 안 되며, 이용에 따른 책임은 사용자에게 있습니다.</li>
+        <li>YouTube 이용약관은 허가 없는 다운로드를 제한합니다. 이 도구는 내 PC에서만 실행되며 공개 서버로 배포하지 마세요.</li>
+      </ul>
+
+      <h3>화질을 고를 때 주의하세요.</h3>
+      <ul>
+        <li><strong>원본 화질</strong>은 4K·AV1 코덱인 경우가 많아 <strong>오래된 PC나 기본 동영상 플레이어에서 재생되지 않을 수 있습니다.</strong> 파일 크기도 매우 큽니다.</li>
+        <li>원본 화질은 mp4에 담을 수 없는 코덱이면 <strong>mkv 파일</strong>로 저장됩니다. 재생이 안 되면 VLC 같은 플레이어를 쓰세요.</li>
+        <li>수업 화면 송출이나 학생 배포용으로는 <strong>1080p 또는 720p</strong>가 가장 안정적입니다.</li>
+        <li>영상에 해당 화질이 없으면 그보다 낮은 화질로 받아집니다. 예: 240p 영상은 720p를 골라도 240p로 저장됩니다.</li>
+      </ul>
+    </section>
+
+    <section class="panel update" id="update" aria-labelledby="update-title">
+      <span class="pill info"><span class="dot info" aria-hidden="true"></span>업데이트 안내</span>
+      <h2 id="update-title">yt-dlp를 주기적으로 업데이트하세요.</h2>
+      <p class="muted">YouTube가 사이트를 바꾸면 오래된 yt-dlp로는 다운로드가 실패하기 쉽습니다. yt-dlp는 설치한 지 90일이 지나면 업데이트를 권장합니다.</p>
+
+      <div class="version" id="version-box">
+        <span class="version-label">설치된 버전</span>
+        <span id="version-text">확인 중...</span>
+      </div>
+
+      <ol class="steps">
+        <li>이 서버를 실행한 터미널에서 <kbd>Ctrl</kbd> + <kbd>C</kbd>로 서버를 끕니다.</li>
+        <li>아래 명령을 실행합니다.
+          <div class="cmd">
+            <code id="update-cmd">python -m pip install -U yt-dlp</code>
+            <button id="copy-cmd" type="button" class="btn ghost small">복사</button>
+          </div>
+        </li>
+        <li><code>python server.py</code>로 서버를 다시 실행합니다.</li>
+      </ol>
+      <p class="muted small-text">다운로드가 실패했을 때 진단에 "접근 거부(403)", "추출기 오류", "yt-dlp 업데이트 필요"가 나오면 먼저 업데이트해 보세요.</p>
+    </section>
+  </main>
+
+  <footer class="footer">제작: yangphago</footer>
+
+  <script src="/app.js"></script>
+</body>
+</html>
